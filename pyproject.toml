@@ -42,10 +42,10 @@ classifiers = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/rveth/tala-locale"
-Repository = "https://github.com/rveth/tala-locale"
-Issues = "https://github.com/rveth/tala-locale/issues"
-Changelog = "https://github.com/rveth/tala-locale/releases"
+Homepage = "https://github.com/rvethllc/tala-locale"
+Repository = "https://github.com/rvethllc/tala-locale"
+Issues = "https://github.com/rvethllc/tala-locale/issues"
+Changelog = "https://github.com/rvethllc/tala-locale/releases"
 
 [project.optional-dependencies]
 dev = [

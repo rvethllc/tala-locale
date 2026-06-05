@@ -1,6 +1,6 @@
 # tala-locale
 
-[![CI](https://github.com/rveth/tala-locale/actions/workflows/ci.yml/badge.svg)](https://github.com/rveth/tala-locale/actions/workflows/ci.yml)
+[![CI](https://github.com/rvethllc/tala-locale/actions/workflows/ci.yml/badge.svg)](https://github.com/rvethllc/tala-locale/actions/workflows/ci.yml)
 [![PyPI Version](https://img.shields.io/pypi/v/tala-locale.svg)](https://pypi.org/project/tala-locale/)
 [![Python Versions](https://img.shields.io/pypi/pyversions/tala-locale.svg)](https://pypi.org/project/tala-locale/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -195,7 +195,7 @@ The longest matching prefix always wins. Prefixes are sorted at import time, so 
 ## Contributing
 
 ```bash
-git clone https://github.com/rveth/tala-locale
+git clone https://github.com/rvethllc/tala-locale
 cd tala-locale
 pip install -e ".[dev]"
 pytest
