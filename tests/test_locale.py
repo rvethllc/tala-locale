@@ -1,5 +1,3 @@
-import pytest
-
 from tala_locale import (
     LocaleResult,
     infer_country,
