@@ -48,7 +48,7 @@ _UNKNOWN = LocaleResult(None, None, None)
 def _canonicalize(phone: str) -> str:
     """Strip all non-digit characters and the 'whatsapp:' prefix."""
     if phone and phone.startswith("whatsapp:"):
-        phone = phone[len("whatsapp:"):]
+        phone = phone[len("whatsapp:") :]
     return "".join(c for c in (phone or "") if c.isdigit())
 
 
