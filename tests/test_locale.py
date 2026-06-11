@@ -1,6 +1,7 @@
 from tala_locale import (
     LocaleResult,
     infer_country,
+    infer_country_from_timezone,
     infer_currency,
     infer_language,
     infer_locale,
@@ -300,3 +301,188 @@ class TestSupportedCountries:
     def test_us_present(self):
         countries = {e["country"] for e in supported_countries()}
         assert "US" in countries
+
+
+# ---------------------------------------------------------------------------
+# infer_country_from_timezone — single-timezone countries
+# ---------------------------------------------------------------------------
+
+
+class TestTimezoneInference:
+    def test_nigeria(self):
+        assert infer_country_from_timezone("Africa/Lagos") == "NG"
+
+    def test_kenya(self):
+        assert infer_country_from_timezone("Africa/Nairobi") == "KE"
+
+    def test_ghana(self):
+        assert infer_country_from_timezone("Africa/Accra") == "GH"
+
+    def test_south_africa(self):
+        assert infer_country_from_timezone("Africa/Johannesburg") == "ZA"
+
+    def test_egypt(self):
+        assert infer_country_from_timezone("Africa/Cairo") == "EG"
+
+    def test_uk(self):
+        assert infer_country_from_timezone("Europe/London") == "GB"
+
+    def test_ireland(self):
+        assert infer_country_from_timezone("Europe/Dublin") == "IE"
+
+    def test_france(self):
+        assert infer_country_from_timezone("Europe/Paris") == "FR"
+
+    def test_germany(self):
+        assert infer_country_from_timezone("Europe/Berlin") == "DE"
+
+    def test_uae(self):
+        assert infer_country_from_timezone("Asia/Dubai") == "AE"
+
+    def test_india(self):
+        assert infer_country_from_timezone("Asia/Kolkata") == "IN"
+
+    def test_india_legacy(self):
+        # Calcutta is a legacy alias for Kolkata
+        assert infer_country_from_timezone("Asia/Calcutta") == "IN"
+
+    def test_japan(self):
+        assert infer_country_from_timezone("Asia/Tokyo") == "JP"
+
+    def test_singapore(self):
+        assert infer_country_from_timezone("Asia/Singapore") == "SG"
+
+    def test_australia_sydney(self):
+        assert infer_country_from_timezone("Australia/Sydney") == "AU"
+
+
+# ---------------------------------------------------------------------------
+# Multi-timezone country disambiguation — the whole point of this feature
+# ---------------------------------------------------------------------------
+
+
+class TestTimezoneMultiZoneCountries:
+    # USA — 7 zones, all must return "US"
+    def test_us_eastern(self):
+        assert infer_country_from_timezone("America/New_York") == "US"
+
+    def test_us_central(self):
+        assert infer_country_from_timezone("America/Chicago") == "US"
+
+    def test_us_mountain(self):
+        assert infer_country_from_timezone("America/Denver") == "US"
+
+    def test_us_pacific(self):
+        assert infer_country_from_timezone("America/Los_Angeles") == "US"
+
+    def test_us_alaska(self):
+        assert infer_country_from_timezone("America/Anchorage") == "US"
+
+    def test_us_hawaii(self):
+        assert infer_country_from_timezone("Pacific/Honolulu") == "US"
+
+    def test_us_arizona(self):
+        assert infer_country_from_timezone("America/Phoenix") == "US"
+
+    # Canada — distinguished from USA despite sharing +1 calling code
+    def test_canada_toronto(self):
+        assert infer_country_from_timezone("America/Toronto") == "CA"
+
+    def test_canada_vancouver(self):
+        assert infer_country_from_timezone("America/Vancouver") == "CA"
+
+    def test_canada_halifax(self):
+        assert infer_country_from_timezone("America/Halifax") == "CA"
+
+    def test_canada_winnipeg(self):
+        assert infer_country_from_timezone("America/Winnipeg") == "CA"
+
+    def test_canada_st_johns(self):
+        assert infer_country_from_timezone("America/St_Johns") == "CA"
+
+    # Indonesia — 3 zones, all return "ID"
+    def test_indonesia_jakarta(self):
+        assert infer_country_from_timezone("Asia/Jakarta") == "ID"
+
+    def test_indonesia_makassar(self):
+        assert infer_country_from_timezone("Asia/Makassar") == "ID"
+
+    def test_indonesia_jayapura(self):
+        assert infer_country_from_timezone("Asia/Jayapura") == "ID"
+
+    # Brazil — 4 zones, all return "BR"
+    def test_brazil_sao_paulo(self):
+        assert infer_country_from_timezone("America/Sao_Paulo") == "BR"
+
+    def test_brazil_manaus(self):
+        assert infer_country_from_timezone("America/Manaus") == "BR"
+
+    def test_brazil_fortaleza(self):
+        assert infer_country_from_timezone("America/Fortaleza") == "BR"
+
+    def test_brazil_recife(self):
+        assert infer_country_from_timezone("America/Recife") == "BR"
+
+    # Russia — 11 zones, spot-check 3
+    def test_russia_moscow(self):
+        assert infer_country_from_timezone("Europe/Moscow") == "RU"
+
+    def test_russia_yekaterinburg(self):
+        assert infer_country_from_timezone("Asia/Yekaterinburg") == "RU"
+
+    def test_russia_vladivostok(self):
+        assert infer_country_from_timezone("Asia/Vladivostok") == "RU"
+
+    # Australia — 7 zones, spot-check 3
+    def test_australia_perth(self):
+        assert infer_country_from_timezone("Australia/Perth") == "AU"
+
+    def test_australia_darwin(self):
+        assert infer_country_from_timezone("Australia/Darwin") == "AU"
+
+    def test_australia_brisbane(self):
+        assert infer_country_from_timezone("Australia/Brisbane") == "AU"
+
+    # China — 2 zones (legacy Chongqing alias), both return "CN"
+    def test_china_shanghai(self):
+        assert infer_country_from_timezone("Asia/Shanghai") == "CN"
+
+    def test_china_urumqi(self):
+        assert infer_country_from_timezone("Asia/Urumqi") == "CN"
+
+    # Mongolia — 3 zones
+    def test_mongolia_ulaanbaatar(self):
+        assert infer_country_from_timezone("Asia/Ulaanbaatar") == "MN"
+
+    def test_mongolia_hovd(self):
+        assert infer_country_from_timezone("Asia/Hovd") == "MN"
+
+    # New Zealand — 2 zones
+    def test_nz_auckland(self):
+        assert infer_country_from_timezone("Pacific/Auckland") == "NZ"
+
+    def test_nz_chatham(self):
+        assert infer_country_from_timezone("Pacific/Chatham") == "NZ"
+
+
+# ---------------------------------------------------------------------------
+# Unknown / edge cases for timezone
+# ---------------------------------------------------------------------------
+
+
+class TestTimezoneEdgeCases:
+    def test_unknown_returns_none(self):
+        assert infer_country_from_timezone("Unknown/Zone") is None
+
+    def test_empty_string_returns_none(self):
+        assert infer_country_from_timezone("") is None
+
+    def test_none_input_returns_none(self):  # type: ignore[arg-type]
+        assert infer_country_from_timezone(None) is None  # type: ignore[arg-type]
+
+    def test_utc_returns_none(self):
+        # UTC is not a country — callers must not assume a country from UTC
+        assert infer_country_from_timezone("UTC") is None
+
+    def test_gmt_returns_none(self):
+        assert infer_country_from_timezone("GMT") is None

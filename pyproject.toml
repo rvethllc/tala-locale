@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "tala-locale"
-version = "0.1.0"
-description = "Phone number → country, currency, and language inference. Zero dependencies."
+version = "0.2.0"
+description = "Phone number and timezone → country, currency, and language inference. Extended locale data (symbols, formatting, VAT, RTL) for 55 countries. Zero dependencies."
 readme = "README.md"
 requires-python = ">=3.10"
 license = {text = "MIT"}

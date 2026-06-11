@@ -9,6 +9,8 @@ from __future__ import annotations
 from typing import NamedTuple
 
 from tala_locale._data import PHONE_PREFIX_MAP
+from tala_locale._extended_data import EXTENDED_LOCALE_MAP, ExtendedLocale
+from tala_locale._timezone_data import TIMEZONE_COUNTRY_MAP
 
 # Pre-sort prefixes longest-first once at import time — O(1) per lookup
 _SORTED_PREFIXES: list[str] = sorted(PHONE_PREFIX_MAP, key=len, reverse=True)
@@ -126,6 +128,50 @@ def is_supported(phone_number: str) -> bool:
     return infer_locale(phone_number).is_known()
 
 
+def infer_country_from_timezone(timezone: str) -> str | None:
+    """Infer ISO 3166-1 alpha-2 country code from an IANA timezone string.
+
+    Parameters
+    ----------
+    timezone:
+        An IANA timezone string, e.g. ``"Africa/Lagos"``, ``"America/Toronto"``,
+        ``"Asia/Jakarta"``.  Typically obtained from
+        ``Intl.DateTimeFormat().resolvedOptions().timeZone`` in the browser.
+
+    Returns
+    -------
+    str | None
+        ISO country code, e.g. ``"NG"``, ``"CA"``, ``"ID"``.
+        ``None`` if the timezone is unrecognised.
+
+    Notes
+    -----
+    Multi-timezone countries are handled correctly:
+
+    - Indonesia has three zones (Jakarta/Makassar/Jayapura) — all return ``"ID"``
+    - Canada and USA share the +1 calling code, but their timezones are distinct
+      (``"America/Toronto"`` → ``"CA"``, ``"America/New_York"`` → ``"US"``)
+    - Russia's 11 zones all return ``"RU"``
+
+    Examples
+    --------
+    >>> infer_country_from_timezone("Africa/Lagos")
+    'NG'
+    >>> infer_country_from_timezone("America/Toronto")
+    'CA'
+    >>> infer_country_from_timezone("America/New_York")
+    'US'
+    >>> infer_country_from_timezone("Asia/Jakarta")
+    'ID'
+    >>> infer_country_from_timezone("Asia/Makassar")
+    'ID'
+    >>> infer_country_from_timezone("Unknown/Zone")
+    """
+    if not timezone:
+        return None
+    return TIMEZONE_COUNTRY_MAP.get(timezone)
+
+
 def supported_countries() -> list[dict[str, str]]:
     """Return a list of all supported countries with their metadata.
 
@@ -154,3 +200,109 @@ def supported_countries() -> list[dict[str, str]]:
             PHONE_PREFIX_MAP.items(), key=lambda kv: (len(kv[0]), kv[0])
         )
     ]
+
+
+def get_extended(country_code: str) -> ExtendedLocale | None:
+    """Return extended locale metadata for a country code, or None if unknown.
+
+    Parameters
+    ----------
+    country_code:
+        ISO 3166-1 alpha-2 country code, e.g. ``"NG"``, ``"DE"``, ``"US"``.
+        Case-insensitive.
+
+    Returns
+    -------
+    ExtendedLocale | None
+        Named tuple with currency symbol, number formatting, VAT rate, date
+        format, RTL flag, week start, and BCP 47 tag.  ``None`` when the
+        country code is not in the extended dataset.
+
+    Examples
+    --------
+    >>> ext = get_extended("NG")
+    >>> ext.currency_symbol
+    '₦'
+    >>> ext.vat_rate
+    0.075
+    >>> ext.rtl
+    False
+    >>> get_extended("XX") is None
+    True
+    """
+    if not country_code:
+        return None
+    return EXTENDED_LOCALE_MAP.get(country_code.upper())
+
+
+def format_amount(value: float | int, country_code: str) -> str:
+    """Format a monetary amount using the country's locale conventions.
+
+    Places the currency symbol before or after the amount per local convention,
+    uses the correct decimal and thousands separators.
+
+    Parameters
+    ----------
+    value:
+        The numeric amount to format, e.g. ``1234.5``.
+    country_code:
+        ISO 3166-1 alpha-2 country code.  Falls back to plain two-decimal
+        formatting with no symbol when the country is not in the extended
+        dataset.
+
+    Returns
+    -------
+    str
+        Formatted string, e.g. ``"₦1,234.50"``, ``"1.234,50 €"``,
+        ``"R 1 234.50"``.
+
+    Examples
+    --------
+    >>> format_amount(1234.5, "NG")
+    '₦1,234.50'
+    >>> format_amount(1234.5, "DE")
+    '1.234,50 €'
+    >>> format_amount(1234.5, "FR")
+    '1 234,50 €'
+    >>> format_amount(1234.5, "US")
+    '$1,234.50'
+    >>> format_amount(1234.5, "ZA")
+    'R 1 234.50'
+    """
+    ext = get_extended(country_code)
+    if ext is None:
+        return f"{value:.2f}"
+
+    # Build the numeric part with correct separators
+    int_part, dec_part = f"{abs(value):.2f}".split(".")
+
+    # Insert thousands separators
+    groups: list[str] = []
+    while len(int_part) > 3:
+        groups.append(int_part[-3:])
+        int_part = int_part[:-3]
+    groups.append(int_part)
+    int_formatted = ext.thousands_sep.join(reversed(groups))
+
+    numeric = f"{int_formatted}{ext.decimal_sep}{dec_part}"
+    sign = "-" if value < 0 else ""
+
+    if ext.currency_before:
+        return f"{sign}{ext.currency_symbol}{numeric}"
+    else:
+        return f"{sign}{numeric} {ext.currency_symbol}"
+
+
+__all__ = [
+    "LocaleResult",
+    "ExtendedLocale",
+    "infer_locale",
+    "infer_country",
+    "infer_currency",
+    "infer_language",
+    "infer_country_from_timezone",
+    "is_supported",
+    "supported_countries",
+    "get_extended",
+    "format_amount",
+]
