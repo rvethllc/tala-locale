@@ -243,9 +243,7 @@ class TestGetUtcOffset:
 
 
 class TestGetLocalDatetime:
-    _UTC = datetime(
-        2025, 1, 15, 12, 0, 0, tzinfo=stdlib_tz.utc
-    )  # January = Northern winter
+    _UTC = datetime(2025, 1, 15, 12, 0, 0, tzinfo=stdlib_tz.utc)  # January = Northern winter
 
     def test_nigeria_utc_plus_1(self):
         local = get_local_datetime(self._UTC, "NG")

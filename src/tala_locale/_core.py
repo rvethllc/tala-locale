@@ -662,9 +662,7 @@ def format_local_datetime(
     # Resolve country code for extended data
     val = (country_code_or_tz or "").strip()
     country: str | None = (
-        val.upper()
-        if len(val) <= 2 and "/" not in val
-        else TIMEZONE_COUNTRY_MAP.get(val)
+        val.upper() if len(val) <= 2 and "/" not in val else TIMEZONE_COUNTRY_MAP.get(val)
     )
 
     ext = get_extended(country) if country else None
@@ -875,10 +873,7 @@ def infer_full_locale(
     # ── Step 5: resolve timezone for the winning country ─────────────────────
     if resolved_tz is None:
         # Use browser_timezone if it belongs to the winning country
-        if (
-            browser_timezone
-            and TIMEZONE_COUNTRY_MAP.get(browser_timezone) == final_country
-        ):
+        if browser_timezone and TIMEZONE_COUNTRY_MAP.get(browser_timezone) == final_country:
             resolved_tz = browser_timezone
         else:
             resolved_tz = COUNTRY_PRIMARY_TZ.get(final_country)
