@@ -17,44 +17,44 @@ from tala_locale import (
 class TestAfrican:
     def test_nigeria(self):
         r = infer_locale("2348012345678")
-        assert r == LocaleResult("NG", "NGN", "en")
+        assert r == LocaleResult("NG", "NGN", "en-NG")
 
     def test_kenya(self):
         r = infer_locale("254712345678")
-        assert r == LocaleResult("KE", "KES", "en")
+        assert r == LocaleResult("KE", "KES", "sw-KE")
 
     def test_ghana(self):
         r = infer_locale("233201234567")
-        assert r == LocaleResult("GH", "GHS", "en")
+        assert r == LocaleResult("GH", "GHS", "en-GH")
 
     def test_south_africa_short_prefix(self):
         # +27 is a 2-digit prefix — must not be shadowed by a 1-digit match
         r = infer_locale("27821234567")
-        assert r == LocaleResult("ZA", "ZAR", "en")
+        assert r == LocaleResult("ZA", "ZAR", "en-ZA")
 
     def test_tanzania_swahili(self):
         r = infer_locale("255712345678")
-        assert r == LocaleResult("TZ", "TZS", "sw")
+        assert r == LocaleResult("TZ", "TZS", "sw-TZ")
 
     def test_egypt_arabic(self):
         r = infer_locale("201012345678")
-        assert r == LocaleResult("EG", "EGP", "ar")
+        assert r == LocaleResult("EG", "EGP", "ar-EG")
 
     def test_senegal_french(self):
         r = infer_locale("221771234567")
-        assert r == LocaleResult("SN", "XOF", "fr")
+        assert r == LocaleResult("SN", "XOF", "fr-SN")
 
     def test_ethiopia_amharic(self):
         r = infer_locale("251911234567")
-        assert r == LocaleResult("ET", "ETB", "am")
+        assert r == LocaleResult("ET", "ETB", "am-ET")
 
     def test_drc(self):
         r = infer_locale("243812345678")
-        assert r == LocaleResult("CD", "CDF", "fr")
+        assert r == LocaleResult("CD", "CDF", "fr-CD")
 
     def test_rwanda(self):
         r = infer_locale("250781234567")
-        assert r == LocaleResult("RW", "RWF", "en")
+        assert r == LocaleResult("RW", "RWF", "rw-RW")
 
 
 # ---------------------------------------------------------------------------
@@ -65,59 +65,59 @@ class TestAfrican:
 class TestGlobal:
     def test_uk(self):
         r = infer_locale("447911123456")
-        assert r == LocaleResult("GB", "GBP", "en")
+        assert r == LocaleResult("GB", "GBP", "en-GB")
 
     def test_usa(self):
         r = infer_locale("14155552671")
-        assert r == LocaleResult("US", "USD", "en")
+        assert r == LocaleResult("US", "USD", "en-US")
 
     def test_france(self):
         r = infer_locale("33612345678")
-        assert r == LocaleResult("FR", "EUR", "fr")
+        assert r == LocaleResult("FR", "EUR", "fr-FR")
 
     def test_germany(self):
         r = infer_locale("4915112345678")
-        assert r == LocaleResult("DE", "EUR", "de")
+        assert r == LocaleResult("DE", "EUR", "de-DE")
 
     def test_india(self):
         r = infer_locale("919812345678")
-        assert r == LocaleResult("IN", "INR", "en")
+        assert r == LocaleResult("IN", "INR", "en-IN")
 
     def test_brazil(self):
         r = infer_locale("5511912345678")
-        assert r == LocaleResult("BR", "BRL", "pt")
+        assert r == LocaleResult("BR", "BRL", "pt-BR")
 
     def test_uae(self):
         r = infer_locale("971501234567")
-        assert r == LocaleResult("AE", "AED", "ar")
+        assert r == LocaleResult("AE", "AED", "ar-AE")
 
     def test_china(self):
         r = infer_locale("8613812345678")
-        assert r == LocaleResult("CN", "CNY", "zh")
+        assert r == LocaleResult("CN", "CNY", "zh-CN")
 
     def test_japan(self):
         r = infer_locale("819012345678")
-        assert r == LocaleResult("JP", "JPY", "ja")
+        assert r == LocaleResult("JP", "JPY", "ja-JP")
 
     def test_australia(self):
         r = infer_locale("61412345678")
-        assert r == LocaleResult("AU", "AUD", "en")
+        assert r == LocaleResult("AU", "AUD", "en-AU")
 
     def test_turkey(self):
         r = infer_locale("905321234567")
-        assert r == LocaleResult("TR", "TRY", "tr")
+        assert r == LocaleResult("TR", "TRY", "tr-TR")
 
     def test_singapore(self):
         r = infer_locale("6591234567")
-        assert r == LocaleResult("SG", "SGD", "en")
+        assert r == LocaleResult("SG", "SGD", "en-SG")
 
     def test_saudi_arabia(self):
         r = infer_locale("966512345678")
-        assert r == LocaleResult("SA", "SAR", "ar")
+        assert r == LocaleResult("SA", "SAR", "ar-SA")
 
     def test_nigeria_with_plus(self):
         r = infer_locale("+2348012345678")
-        assert r == LocaleResult("NG", "NGN", "en")
+        assert r == LocaleResult("NG", "NGN", "en-NG")
 
 
 # ---------------------------------------------------------------------------
@@ -129,30 +129,30 @@ class TestPrefixMatching:
     def test_trinidad_beats_usa(self):
         # +1868 (Trinidad) must win over +1 (USA)
         r = infer_locale("18681234567")
-        assert r == LocaleResult("TT", "TTD", "en")
+        assert r == LocaleResult("TT", "TTD", "en-TT")
 
     def test_jamaica_beats_usa(self):
         r = infer_locale("18761234567")
-        assert r == LocaleResult("JM", "JMD", "en")
+        assert r == LocaleResult("JM", "JMD", "en-JM")
 
     def test_barbados_beats_usa(self):
         r = infer_locale("12461234567")
-        assert r == LocaleResult("BB", "BBD", "en")
+        assert r == LocaleResult("BB", "BBD", "en-BB")
 
     def test_hong_kong_beats_china(self):
         # +852 must win over +86 — different first digits so this tests ordering
         r = infer_locale("85291234567")
-        assert r == LocaleResult("HK", "HKD", "zh")
+        assert r == LocaleResult("HK", "HKD", "zh-HK")
 
     def test_bangladesh_beats_india_prefix_clash(self):
         # +880 starts with '8' — must not be confused with +86 (China)
         r = infer_locale("8801712345678")
-        assert r == LocaleResult("BD", "BDT", "bn")
+        assert r == LocaleResult("BD", "BDT", "bn-BD")
 
     def test_finland_beats_short_prefix(self):
         # +358 must not clash with +35x shorter candidates
         r = infer_locale("358401234567")
-        assert r == LocaleResult("FI", "EUR", "fi")
+        assert r == LocaleResult("FI", "EUR", "fi-FI")
 
 
 # ---------------------------------------------------------------------------
@@ -228,13 +228,13 @@ class TestLocaleResult:
         country, currency, language = infer_locale("+2348012345678")
         assert country == "NG"
         assert currency == "NGN"
-        assert language == "en"
+        assert language == "en-NG"
 
     def test_named_field_access(self):
         r = infer_locale("+14155552671")
         assert r.country == "US"
         assert r.currency == "USD"
-        assert r.language == "en"
+        assert r.language == "en-US"
 
 
 # ---------------------------------------------------------------------------
@@ -252,7 +252,7 @@ class TestShortcuts:
         assert infer_currency("+882123456789") is None
 
     def test_infer_language(self):
-        assert infer_language("+2348012345678") == "en"
+        assert infer_language("+2348012345678") == "en-NG"
         assert infer_language("+882123456789") is None
 
 

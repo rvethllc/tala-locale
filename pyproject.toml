@@ -4,19 +4,23 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "tala-locale"
-version = "0.2.0"
-description = "Phone number and timezone → country, currency, and language inference. Extended locale data (symbols, formatting, VAT, RTL) for 55 countries. Zero dependencies."
+version = "3.0.0"
+description = "Phone number + timezone → country, currency, language, IANA timezone, UTC offset, and full formatting metadata. 191 countries, 590+ IANA zones, 1,590+ area codes, flat FullLocaleResult, BCP 47 language tags. Zero runtime dependencies."
 readme = "README.md"
 requires-python = ">=3.10"
 license = {text = "MIT"}
+# tzdata is only needed on Windows — Linux/Mac have a system timezone database.
+# On Lambda (Linux) this is a zero-dep library at runtime.
+dependencies = ["tzdata; sys_platform == 'win32'"]
 authors = [
     {name = "RVETH", email = "engineering@rveth.in"},
 ]
 keywords = [
     "phone", "locale", "country", "currency", "language",
+    "timezone", "iana-timezone", "utc-offset", "dst",
     "i18n", "internationalization", "localization", "inference",
     "E.164", "fintech", "saas", "onboarding", "geolocation",
-    "iso-3166", "iso-4217", "iso-639",
+    "iso-3166", "iso-4217", "iso-639", "bcp47", "datetime",
 ]
 classifiers = [
     "Development Status :: 5 - Production/Stable",
@@ -72,6 +76,11 @@ src = ["src"]
 
 [tool.ruff.lint]
 select = ["E", "F", "UP", "B", "I", "SIM"]
+
+[tool.ruff.lint.per-file-ignores]
+# Generated/data files — long lines are intentional, not reformattable
+"src/tala_locale/_area_data.py" = ["E501"]
+"src/tala_locale/_extended_data.py" = ["E501"]
 
 [tool.mypy]
 python_version = "3.10"
