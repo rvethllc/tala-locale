@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "tala-locale"
 version = "3.0.0"
-description = "Phone number + timezone → country, currency, language, IANA timezone, UTC offset, and full formatting metadata. 191 countries, 590+ IANA zones, 1,590+ area codes, flat FullLocaleResult, BCP 47 language tags. Zero runtime dependencies."
+description = "Phone number, timezone, or area code → timezone-correct timestamps, currency, VAT rate, BCP 47 languages, RTL flag, date format, number separators, and more. 193 countries, 590+ IANA zones, 1,590+ area codes. Zero runtime dependencies."
 readme = "README.md"
 requires-python = ">=3.10"
 license = {text = "MIT"}
@@ -21,6 +21,8 @@ keywords = [
     "i18n", "internationalization", "localization", "inference",
     "E.164", "fintech", "saas", "onboarding", "geolocation",
     "iso-3166", "iso-4217", "iso-639", "bcp47", "datetime",
+    "zoneinfo", "timestamp", "vat", "rtl", "pdf", "financial",
+    "date-format", "number-format", "area-code", "multi-language",
 ]
 classifiers = [
     "Development Status :: 5 - Production/Stable",

@@ -140,6 +140,60 @@ r.confidence       # 0.8
 
 ---
 
+## Timezone-correct timestamps
+
+This is the most powerful use case. A server clock (AWS Lambda, ECS, any cloud) gives you a perfectly accurate UTC time. `tala-locale` gives you the IANA key to convert it to the user's exact local time — correct to the microsecond.
+
+```python
+from datetime import datetime, timezone
+from zoneinfo import ZoneInfo          # stdlib, Python 3.9+
+from tala_locale import infer_timezone
+
+# One call: country → IANA timezone key
+tz_key = infer_timezone("NG")          # "Africa/Lagos"
+tz_key = infer_timezone("AE")          # "Asia/Dubai"
+tz_key = infer_timezone("MA")          # "Africa/Casablanca"
+
+# Convert server UTC clock to business local time
+utc_now = datetime.now(timezone.utc)   # AWS atomic clock, accurate to ~0.1ms
+local_now = utc_now.astimezone(ZoneInfo(tz_key))
+
+# 2026-06-14 23:58:42.019234+01:00   ← Lagos, microsecond precision
+# 2026-06-15 02:58:42.019234+04:00   ← Dubai (next day!)
+# 2026-06-14 23:58:42.019234+01:00   ← Casablanca
+
+# Write the correct local date to your database
+local_date = local_now.date()          # date(2026, 6, 14) or date(2026, 6, 15)
+```
+
+**Why this matters for financial records:** A server in Ireland (UTC+0/+1) writing `date.today()` would stamp a Dubai invoice with yesterday's date at 1am local time. With `infer_timezone` + `ZoneInfo`, every invoice, transaction, and journal entry gets the business's actual local date — regardless of where your servers run.
+
+The full timestamp written to the database includes the UTC offset, so you can always convert back:
+
+```python
+# Stamp written: 2026-06-15 02:58:42.019234+04:00  (Dubai)
+# Convert to UTC: 2026-06-14 22:58:42.019234+00:00  (same instant)
+# All timestamps align perfectly across timezones
+```
+
+**Works with `format_local_datetime` for display:**
+
+```python
+from tala_locale import format_local_datetime
+from datetime import datetime, timezone
+
+utc_now = datetime.now(timezone.utc)
+
+format_local_datetime(utc_now, "NG")           # "14/06/2026 23:58"
+format_local_datetime(utc_now, "SE")           # "2026-06-14 23:58"  (ISO, Sweden)
+format_local_datetime(utc_now, "US")           # "06/14/2026 23:58"  (US format)
+format_local_datetime(utc_now, "AE")           # "15/06/2026 02:58"  (next day, Dubai)
+```
+
+The date format is locale-correct automatically — `r.date_format` drives it.
+
+---
+
 ## Phone format tolerance
 
 tala-locale accepts phone numbers in any common format:
